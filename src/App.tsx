@@ -14,6 +14,8 @@ import CadastroParoquia from "./pages/CadastroParoquia";
 import ParoquiaPublica from "./pages/ParoquiaPublica";
 import ParoquiaDashboard from "./pages/painel/ParoquiaDashboard";
 import ParoquiaConfiguracoes from "./pages/painel/ParoquiaConfiguracoes";
+import ParoquiaCampanhas from "./pages/painel/ParoquiaCampanhas";
+import ParoquiaCampanhaForm from "./pages/painel/ParoquiaCampanhaForm";
 import AdminDashboard from "./pages/painel/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
@@ -36,6 +38,9 @@ const App = () => (
             <Route path="/paroquia/cadastro" element={<ProtectedRoute><CadastroParoquia /></ProtectedRoute>} />
             <Route path="/painel/paroquia" element={<ProtectedRoute><ParoquiaDashboard /></ProtectedRoute>} />
             <Route path="/painel/paroquia/configuracoes" element={<ProtectedRoute><ParoquiaConfiguracoes /></ProtectedRoute>} />
+            <Route path="/painel/paroquia/campanhas" element={<ProtectedRoute><ParoquiaCampanhas /></ProtectedRoute>} />
+            <Route path="/painel/paroquia/campanhas/nova" element={<ProtectedRoute><ParoquiaCampanhaForm /></ProtectedRoute>} />
+            <Route path="/painel/paroquia/campanhas/:id/editar" element={<ProtectedRoute><ParoquiaCampanhaForm /></ProtectedRoute>} />
             <Route path="/painel/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
