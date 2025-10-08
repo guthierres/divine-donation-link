@@ -52,20 +52,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         if (session?.user) {
           await loadUserProfile(session.user.id);
-
-          if (event === 'SIGNED_IN') {
-            const userProfile = await supabase
-              .from("users")
-              .select("role")
-              .eq("id", session.user.id)
-              .maybeSingle();
-
-            if (userProfile.data?.role === 'super_admin') {
-              window.location.href = '/painel/admin';
-            } else {
-              window.location.href = '/painel/paroquia';
-            }
-          }
         } else {
           setProfile(null);
         }
@@ -92,12 +78,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) throw error;
+
+    if (data.user) {
+      const { data: userProfile } = await supabase
+        .from("users")
+        .select("role")
+        .eq("id", data.user.id)
+        .maybeSingle();
+
+      if (userProfile?.role === 'super_admin') {
+        navigate('/painel/admin');
+      } else {
+        navigate('/painel/paroquia');
+      }
+    }
   };
 
   const signUp = async (email: string, password: string, fullName: string, role: string = "parish_admin") => {
