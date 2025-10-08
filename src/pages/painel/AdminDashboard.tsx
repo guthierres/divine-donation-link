@@ -5,16 +5,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Church, TrendingUp, Heart, Users, CheckCircle, XCircle, LogOut } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Church, TrendingUp, Heart, Users, CheckCircle, XCircle, LogOut, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Parish {
   id: string;
   name: string;
+  slug: string;
   email: string;
   city: string;
   state: string;
   status: string;
+  pagarme_configured: boolean;
   created_at: string;
 }
 
@@ -38,6 +41,7 @@ const AdminDashboard = () => {
     totalDonations: 0,
   });
   const [pendingParishes, setPendingParishes] = useState<Parish[]>([]);
+  const [allParishes, setAllParishes] = useState<Parish[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
@@ -78,6 +82,7 @@ const AdminDashboard = () => {
       });
 
       setPendingParishes(parishes?.filter((p) => p.status === "pending") || []);
+      setAllParishes(parishes || []);
     } catch (error) {
       console.error("Error loading dashboard:", error);
       toast({
@@ -275,65 +280,194 @@ const AdminDashboard = () => {
           </Card>
         </div>
 
-        {pendingParishes.length > 0 && (
-          <Card className="shadow-divine">
-            <CardHeader>
-              <CardTitle className="font-playfair">Paróquias Pendentes de Aprovação</CardTitle>
-              <CardDescription>
-                Revise e aprove as paróquias que solicitaram cadastro
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Nome</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Localização</TableHead>
-                    <TableHead>Data</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {pendingParishes.map((parish) => (
-                    <TableRow key={parish.id}>
-                      <TableCell className="font-medium">{parish.name}</TableCell>
-                      <TableCell>{parish.email}</TableCell>
-                      <TableCell>
-                        {parish.city}, {parish.state}
-                      </TableCell>
-                      <TableCell>
-                        {new Date(parish.created_at).toLocaleDateString("pt-BR")}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="secondary">Pendente</Badge>
-                      </TableCell>
-                      <TableCell className="text-right space-x-2">
-                        <Button
-                          size="sm"
-                          onClick={() => handleApproveParish(parish.id)}
-                          className="bg-green-600 hover:bg-green-700"
-                        >
-                          <CheckCircle className="h-4 w-4 mr-1" />
-                          Aprovar
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleRejectParish(parish.id)}
-                        >
-                          <XCircle className="h-4 w-4 mr-1" />
-                          Rejeitar
-                        </Button>
-                      </TableCell>
+        <Card className="shadow-divine">
+          <CardHeader>
+            <CardTitle className="font-playfair">Gerenciamento de Paróquias</CardTitle>
+            <CardDescription>
+              Visualize e gerencie todas as paróquias cadastradas na plataforma
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue={pendingParishes.length > 0 ? "pending" : "all"}>
+              <TabsList className="mb-4">
+                {pendingParishes.length > 0 && (
+                  <TabsTrigger value="pending">
+                    Pendentes ({pendingParishes.length})
+                  </TabsTrigger>
+                )}
+                <TabsTrigger value="all">
+                  Todas ({allParishes.length})
+                </TabsTrigger>
+                <TabsTrigger value="active">
+                  Ativas ({allParishes.filter((p) => p.status === "active").length})
+                </TabsTrigger>
+              </TabsList>
+
+              {pendingParishes.length > 0 && (
+                <TabsContent value="pending">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Nome</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Localização</TableHead>
+                        <TableHead>Data</TableHead>
+                        <TableHead>Pagar.me</TableHead>
+                        <TableHead className="text-right">Ações</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {pendingParishes.map((parish) => (
+                        <TableRow key={parish.id}>
+                          <TableCell className="font-medium">{parish.name}</TableCell>
+                          <TableCell>{parish.email}</TableCell>
+                          <TableCell>
+                            {parish.city}, {parish.state}
+                          </TableCell>
+                          <TableCell>
+                            {new Date(parish.created_at).toLocaleDateString("pt-BR")}
+                          </TableCell>
+                          <TableCell>
+                            {parish.pagarme_configured ? (
+                              <Badge variant="default" className="bg-green-600">Configurado</Badge>
+                            ) : (
+                              <Badge variant="secondary">Não configurado</Badge>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right space-x-2">
+                            <Button
+                              size="sm"
+                              onClick={() => handleApproveParish(parish.id)}
+                              className="bg-green-600 hover:bg-green-700"
+                            >
+                              <CheckCircle className="h-4 w-4 mr-1" />
+                              Aprovar
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => handleRejectParish(parish.id)}
+                            >
+                              <XCircle className="h-4 w-4 mr-1" />
+                              Rejeitar
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TabsContent>
+              )}
+
+              <TabsContent value="all">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nome</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Localização</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Pagar.me</TableHead>
+                      <TableHead>Data</TableHead>
+                      <TableHead className="text-right">Ações</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        )}
+                  </TableHeader>
+                  <TableBody>
+                    {allParishes.map((parish) => (
+                      <TableRow key={parish.id}>
+                        <TableCell className="font-medium">{parish.name}</TableCell>
+                        <TableCell>{parish.email}</TableCell>
+                        <TableCell>
+                          {parish.city}, {parish.state}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={
+                            parish.status === "active" ? "default" :
+                            parish.status === "pending" ? "secondary" :
+                            "destructive"
+                          }>
+                            {parish.status === "active" ? "Ativa" :
+                             parish.status === "pending" ? "Pendente" : "Inativa"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {parish.pagarme_configured ? (
+                            <Badge variant="default" className="bg-green-600">Configurado</Badge>
+                          ) : (
+                            <Badge variant="secondary">Não configurado</Badge>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {new Date(parish.created_at).toLocaleDateString("pt-BR")}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            asChild
+                          >
+                            <a href={`/paroquia/${parish.slug}`} target="_blank" rel="noopener noreferrer">
+                              <Eye className="h-4 w-4 mr-1" />
+                              Ver
+                            </a>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TabsContent>
+
+              <TabsContent value="active">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nome</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Localização</TableHead>
+                      <TableHead>Pagar.me</TableHead>
+                      <TableHead>Data</TableHead>
+                      <TableHead className="text-right">Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {allParishes.filter((p) => p.status === "active").map((parish) => (
+                      <TableRow key={parish.id}>
+                        <TableCell className="font-medium">{parish.name}</TableCell>
+                        <TableCell>{parish.email}</TableCell>
+                        <TableCell>
+                          {parish.city}, {parish.state}
+                        </TableCell>
+                        <TableCell>
+                          {parish.pagarme_configured ? (
+                            <Badge variant="default" className="bg-green-600">Configurado</Badge>
+                          ) : (
+                            <Badge variant="secondary">Não configurado</Badge>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {new Date(parish.created_at).toLocaleDateString("pt-BR")}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            asChild
+                          >
+                            <a href={`/paroquia/${parish.slug}`} target="_blank" rel="noopener noreferrer">
+                              <Eye className="h-4 w-4 mr-1" />
+                              Ver
+                            </a>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
       </main>
     </div>
   );

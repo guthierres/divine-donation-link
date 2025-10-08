@@ -25,7 +25,7 @@ Deno.serve(async (req: Request) => {
     console.log("Webhook received:", payload);
 
     const eventType = payload.type || payload.event;
-    const transactionId = payload.id || payload.transaction?.id;
+    const transactionId = payload.id || payload.transaction?.id || payload.data?.id;
 
     if (!transactionId) {
       return new Response(
@@ -43,21 +43,25 @@ Deno.serve(async (req: Request) => {
       case "charge.paid":
       case "transaction.paid":
       case "payment.paid":
+      case "order.paid":
         newStatus = "paid";
         break;
       case "charge.refunded":
       case "transaction.refunded":
       case "payment.refunded":
+      case "order.refunded":
         newStatus = "refunded";
         break;
       case "charge.failed":
       case "transaction.failed":
       case "payment.failed":
+      case "order.payment_failed":
         newStatus = "failed";
         break;
       case "charge.processing":
       case "transaction.processing":
       case "payment.processing":
+      case "order.pending":
         newStatus = "processing";
         break;
       default:

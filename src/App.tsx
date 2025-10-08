@@ -13,6 +13,7 @@ import Registro from "./pages/Registro";
 import CadastroParoquia from "./pages/CadastroParoquia";
 import ParoquiaPublica from "./pages/ParoquiaPublica";
 import ParoquiaDashboard from "./pages/painel/ParoquiaDashboard";
+import ParoquiaConfiguracoes from "./pages/painel/ParoquiaConfiguracoes";
 import AdminDashboard from "./pages/painel/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/registro" element={<Registro />} />
             <Route path="/paroquia/cadastro" element={<ProtectedRoute><CadastroParoquia /></ProtectedRoute>} />
             <Route path="/painel/paroquia" element={<ProtectedRoute><ParoquiaDashboard /></ProtectedRoute>} />
+            <Route path="/painel/paroquia/configuracoes" element={<ProtectedRoute><ParoquiaConfiguracoes /></ProtectedRoute>} />
             <Route path="/painel/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

@@ -14,7 +14,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const { signIn, profile } = useAuth();
+  const { signIn } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -25,21 +25,8 @@ const Login = () => {
 
     try {
       await signIn(email, password);
-      toast({
-        title: "Login realizado com sucesso!",
-        description: "Redirecionando para o painel...",
-      });
-
-      setTimeout(() => {
-        if (profile?.role === "super_admin") {
-          navigate("/painel/admin");
-        } else {
-          navigate("/painel/paroquia");
-        }
-      }, 500);
     } catch (err: any) {
       setError(err.message || "Erro ao fazer login. Verifique suas credenciais.");
-    } finally {
       setIsLoading(false);
     }
   };

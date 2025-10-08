@@ -45,13 +45,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       })();
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       (async () => {
         setSession(session);
         setUser(session?.user ?? null);
 
         if (session?.user) {
           await loadUserProfile(session.user.id);
+
+          if (event === 'SIGNED_IN') {
+            const userProfile = await supabase
+              .from("users")
+              .select("role")
+              .eq("id", session.user.id)
+              .maybeSingle();
+
+            if (userProfile.data?.role === 'super_admin') {
+              window.location.href = '/painel/admin';
+            } else {
+              window.location.href = '/painel/paroquia';
+            }
+          }
         } else {
           setProfile(null);
         }
