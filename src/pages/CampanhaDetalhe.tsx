@@ -1,5 +1,9 @@
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import CheckoutDialog from "@/components/CheckoutDialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -15,13 +19,114 @@ import {
   Church,
   TrendingUp,
 } from "lucide-react";
-import { useParams } from "react-router-dom";
+
+interface CampaignData {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  parish: string;
+  parishId: string;
+  location: string;
+  address: string;
+  image: string;
+  currentAmount: number;
+  goalAmount: number;
+  donorsCount: number;
+  daysLeft: number;
+  createdAt: string;
+}
 
 const CampanhaDetalhe = () => {
   const { slug } = useParams();
+  const [campaign, setCampaign] = useState<CampaignData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
 
-  // Sample campaign data - will be replaced with real data later
-  const campaign = {
+  useEffect(() => {
+    loadCampaign();
+  }, [slug]);
+
+  const loadCampaign = async () => {
+    try {
+      const { data: campaignData, error: campaignError } = await supabase
+        .from("campaigns")
+        .select(`
+          *,
+          parishes (
+            id,
+            name,
+            city,
+            state,
+            address
+          )
+        `)
+        .eq("slug", slug)
+        .eq("status", "active")
+        .maybeSingle();
+
+      if (campaignError) throw campaignError;
+
+      if (campaignData) {
+        const { count: donorsCount } = await supabase
+          .from("donations")
+          .select("*", { count: "exact", head: true })
+          .eq("campaign_id", campaignData.id)
+          .eq("status", "paid");
+
+        const endDate = new Date(campaignData.end_date);
+        const today = new Date();
+        const daysLeft = Math.max(0, Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)));
+
+        setCampaign({
+          id: campaignData.id,
+          title: campaignData.title,
+          description: campaignData.description,
+          category: campaignData.category,
+          parish: campaignData.parishes?.name || "Paróquia",
+          parishId: campaignData.parish_id,
+          location: `${campaignData.parishes?.city || ""}, ${campaignData.parishes?.state || ""}`,
+          address: campaignData.parishes?.address || "",
+          image: campaignData.image_url || "https://images.unsplash.com/photo-1464207687429-7505649dae38?w=1200&q=80",
+          currentAmount: Number(campaignData.current_amount) || 0,
+          goalAmount: Number(campaignData.goal_amount) || 0,
+          donorsCount: donorsCount || 0,
+          daysLeft,
+          createdAt: campaignData.created_at,
+        });
+      }
+    } catch (error) {
+      console.error("Error loading campaign:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-muted-foreground">Carregando...</p>
+      </div>
+    );
+  }
+
+  if (!campaign) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <Church className="h-16 w-16 text-muted-foreground mx-auto" />
+            <h1 className="font-playfair text-3xl font-bold">Campanha não encontrada</h1>
+            <p className="text-muted-foreground">A campanha que você procura não existe ou não está mais ativa.</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  const sampleCampaign = {
     id: "1",
     title: "Reforma do Telhado da Igreja Matriz",
     parish: "Paróquia Sagrada Família",
@@ -198,6 +303,7 @@ Contamos com a generosidade de todos os fiéis e amigos da paróquia para tornar
                     <Button
                       size="lg"
                       className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-sacred"
+                      onClick={() => setCheckoutOpen(true)}
                     >
                       <Heart className="mr-2 h-5 w-5" />
                       Fazer uma Doação
@@ -252,6 +358,14 @@ Contamos com a generosidade de todos os fiéis e amigos da paróquia para tornar
       </section>
 
       <Footer />
+
+      <CheckoutDialog
+        open={checkoutOpen}
+        onOpenChange={setCheckoutOpen}
+        campaignId={campaign.id}
+        parishId={campaign.parishId}
+        campaignTitle={campaign.title}
+      />
     </div>
   );
 };

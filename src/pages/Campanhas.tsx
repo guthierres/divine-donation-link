@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CampaignCard from "@/components/CampaignCard";
@@ -12,9 +14,81 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+interface Campaign {
+  id: string;
+  title: string;
+  slug: string;
+  parish: string;
+  location: string;
+  image: string;
+  currentAmount: number;
+  goalAmount: number;
+  donorsCount: number;
+}
+
 const Campanhas = () => {
-  // Sample campaigns data - will be replaced with real data later
-  const campaigns = [
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    loadCampaigns();
+  }, []);
+
+  const loadCampaigns = async () => {
+    try {
+      const { data: campaignsData, error: campaignsError } = await supabase
+        .from("campaigns")
+        .select(`
+          id,
+          title,
+          slug,
+          image_url,
+          goal_amount,
+          current_amount,
+          parish_id,
+          parishes (
+            name,
+            city,
+            state
+          )
+        `)
+        .eq("status", "active");
+
+      if (campaignsError) throw campaignsError;
+
+      const { data: donationsCount } = await supabase
+        .from("donations")
+        .select("campaign_id", { count: "exact" })
+        .eq("status", "paid");
+
+      const formattedCampaigns: Campaign[] = campaignsData?.map((campaign: any) => ({
+        id: campaign.id,
+        title: campaign.title,
+        slug: campaign.slug,
+        parish: campaign.parishes?.name || "Paróquia",
+        location: `${campaign.parishes?.city || ""}, ${campaign.parishes?.state || ""}`,
+        image: campaign.image_url || "https://images.unsplash.com/photo-1464207687429-7505649dae38?w=800&q=80",
+        currentAmount: Number(campaign.current_amount) || 0,
+        goalAmount: Number(campaign.goal_amount) || 0,
+        donorsCount: donationsCount?.filter((d) => d.campaign_id === campaign.id).length || 0,
+      })) || [];
+
+      setCampaigns(formattedCampaigns);
+    } catch (error) {
+      console.error("Error loading campaigns:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredCampaigns = campaigns.filter((campaign) =>
+    campaign.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    campaign.parish.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    campaign.location.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const sampleCampaigns = [
     {
       id: "1",
       title: "Reforma do Telhado da Igreja Matriz",
@@ -108,6 +182,8 @@ const Campanhas = () => {
               <Input
                 placeholder="Buscar por paróquia, cidade ou causa..."
                 className="pl-10"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
             <Select>
@@ -147,15 +223,25 @@ const Campanhas = () => {
         <div className="container mx-auto px-4">
           <div className="mb-6 flex justify-between items-center">
             <p className="text-muted-foreground">
-              Exibindo <span className="font-semibold text-foreground">{campaigns.length}</span> campanhas
+              Exibindo <span className="font-semibold text-foreground">{filteredCampaigns.length}</span> campanhas
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {campaigns.map((campaign) => (
-              <CampaignCard key={campaign.id} {...campaign} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">Carregando campanhas...</p>
+            </div>
+          ) : filteredCampaigns.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">Nenhuma campanha encontrada.</p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredCampaigns.map((campaign) => (
+                <CampaignCard key={campaign.id} {...campaign} />
+              ))}
+            </div>
+          )}
 
           {/* Pagination would go here */}
           <div className="mt-12 flex justify-center">
