@@ -16,7 +16,10 @@ import ParoquiaDashboard from "./pages/painel/ParoquiaDashboard";
 import ParoquiaConfiguracoes from "./pages/painel/ParoquiaConfiguracoes";
 import ParoquiaCampanhas from "./pages/painel/ParoquiaCampanhas";
 import ParoquiaCampanhaForm from "./pages/painel/ParoquiaCampanhaForm";
+import ParoquiaDoacoes from "./pages/painel/ParoquiaDoacoes";
 import AdminDashboard from "./pages/painel/AdminDashboard";
+import DonationSuccess from "./pages/DonationSuccess";
+import DonationError from "./pages/DonationError";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -41,7 +44,10 @@ const App = () => (
             <Route path="/painel/paroquia/campanhas" element={<ProtectedRoute><ParoquiaCampanhas /></ProtectedRoute>} />
             <Route path="/painel/paroquia/campanhas/nova" element={<ProtectedRoute><ParoquiaCampanhaForm /></ProtectedRoute>} />
             <Route path="/painel/paroquia/campanhas/:id/editar" element={<ProtectedRoute><ParoquiaCampanhaForm /></ProtectedRoute>} />
+            <Route path="/painel/paroquia/doacoes" element={<ProtectedRoute><ParoquiaDoacoes /></ProtectedRoute>} />
             <Route path="/painel/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/doacao/sucesso" element={<DonationSuccess />} />
+            <Route path="/doacao/erro" element={<DonationError />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

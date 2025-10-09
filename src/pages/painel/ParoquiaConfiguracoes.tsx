@@ -15,7 +15,9 @@ import { useToast } from "@/hooks/use-toast";
 interface Parish {
   id: string;
   name: string;
-  pagarme_public_key: string | null;
+  logo_url: string | null;
+  cover_url: string | null;
+  icon_url: string | null;
   pagarme_secret_key: string | null;
   pagarme_configured: boolean;
 }
