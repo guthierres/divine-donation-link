@@ -146,18 +146,18 @@ export default function DonationSuccess() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-sacred flex items-center justify-center">
-        <p className="text-lg text-muted-foreground">Carregando...</p>
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-sky-50 to-slate-50 flex items-center justify-center">
+        <p className="text-lg text-slate-600">Carregando...</p>
       </div>
     );
   }
 
   if (!donation) {
     return (
-      <div className="min-h-screen bg-gradient-sacred flex items-center justify-center">
-        <Card className="p-8 max-w-md text-center">
-          <p className="text-lg text-muted-foreground">Doação não encontrada</p>
-          <Button onClick={() => navigate("/")} className="mt-4">
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-sky-50 to-slate-50 flex items-center justify-center">
+        <Card className="p-8 max-w-md text-center shadow-xl">
+          <p className="text-lg text-slate-700">Doação não encontrada</p>
+          <Button onClick={() => navigate("/")} className="mt-4 bg-gradient-to-r from-blue-600 to-sky-600 hover:from-blue-700 hover:to-sky-700">
             Voltar ao Início
           </Button>
         </Card>
@@ -166,83 +166,83 @@ export default function DonationSuccess() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-sacred flex items-center justify-center p-4">
-      <Card className="p-8 max-w-2xl w-full bg-card/50 backdrop-blur-sm border-border/50 shadow-divine">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-sky-50 to-slate-50 flex items-center justify-center p-4">
+      <Card className="p-6 md:p-8 max-w-2xl w-full bg-white shadow-2xl border-slate-200">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-emerald-500/10 rounded-full mb-4">
-            <CheckCircle className="h-12 w-12 text-emerald-600" />
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-emerald-500 to-green-600 rounded-full mb-4 shadow-lg">
+            <CheckCircle className="h-12 w-12 text-white" />
           </div>
-          <h1 className="text-3xl font-serif text-foreground mb-2">
+          <h1 className="text-3xl md:text-4xl font-playfair font-bold text-slate-900 mb-2">
             Doação Confirmada!
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-base md:text-lg text-slate-600">
             Muito obrigado pela sua contribuição!
           </p>
         </div>
 
-        <div className="bg-background/50 rounded-lg p-6 mb-6 space-y-3">
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Valor doado:</span>
-            <span className="font-semibold text-foreground">
+        <div className="bg-slate-50 rounded-xl p-4 md:p-6 mb-6 space-y-3 border border-slate-200">
+          <div className="flex justify-between items-center">
+            <span className="text-slate-600 text-sm md:text-base">Valor doado:</span>
+            <span className="font-bold text-lg md:text-xl text-emerald-600">
               R$ {Number(donation.amount).toFixed(2)}
             </span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Método de pagamento:</span>
-            <span className="font-semibold text-foreground">
+          <div className="flex justify-between items-center">
+            <span className="text-slate-600 text-sm md:text-base">Método de pagamento:</span>
+            <span className="font-semibold text-slate-900 text-sm md:text-base">
               {getPaymentMethodLabel(donation.payment_method)}
             </span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Data:</span>
-            <span className="font-semibold text-foreground">
+          <div className="flex justify-between items-center">
+            <span className="text-slate-600 text-sm md:text-base">Data:</span>
+            <span className="font-semibold text-slate-900 text-sm md:text-base">
               {format(new Date(donation.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
             </span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Campanha:</span>
-            <span className="font-semibold text-foreground">
+          <div className="flex justify-between items-start">
+            <span className="text-slate-600 text-sm md:text-base">Campanha:</span>
+            <span className="font-semibold text-slate-900 text-sm md:text-base text-right max-w-[60%]">
               {donation.campaigns?.title}
             </span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Paróquia:</span>
-            <span className="font-semibold text-foreground">
+          <div className="flex justify-between items-start">
+            <span className="text-slate-600 text-sm md:text-base">Paróquia:</span>
+            <span className="font-semibold text-slate-900 text-sm md:text-base text-right max-w-[60%]">
               {donation.parishes?.name}
             </span>
           </div>
           {donation.transaction_id && (
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">ID da transação:</span>
-              <span className="font-mono text-sm text-foreground">
+            <div className="flex justify-between items-center">
+              <span className="text-slate-600 text-sm md:text-base">ID da transação:</span>
+              <span className="font-mono text-xs md:text-sm text-slate-900">
                 {donation.transaction_id}
               </span>
             </div>
           )}
         </div>
 
-        <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 mb-6 text-center">
-          <p className="text-sm text-foreground italic">
-            "Cada um contribua conforme determinou em seu coração, não com pesar ou por obrigação, 
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 md:p-6 mb-6 text-center">
+          <p className="text-sm md:text-base text-slate-700 italic leading-relaxed">
+            "Cada um contribua conforme determinou em seu coração, não com pesar ou por obrigação,
             pois Deus ama quem dá com alegria."
           </p>
-          <p className="text-xs text-muted-foreground mt-2">2 Coríntios 9:7</p>
+          <p className="text-xs md:text-sm text-blue-600 font-semibold mt-2">2 Coríntios 9:7</p>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
           <Button
             onClick={generatePDF}
-            className="flex-1"
+            className="flex-1 h-12 text-base border-2 border-slate-300 hover:bg-slate-50"
             variant="outline"
           >
-            <Download className="mr-2 h-4 w-4" />
+            <Download className="mr-2 h-5 w-5" />
             Baixar Comprovante
           </Button>
           <Button
             onClick={() => navigate("/")}
-            className="flex-1"
+            className="flex-1 h-12 text-base bg-gradient-to-r from-blue-600 to-sky-600 hover:from-blue-700 hover:to-sky-700 shadow-lg hover:shadow-xl transition-all"
           >
-            <Home className="mr-2 h-4 w-4" />
+            <Home className="mr-2 h-5 w-5" />
             Voltar ao Início
           </Button>
         </div>

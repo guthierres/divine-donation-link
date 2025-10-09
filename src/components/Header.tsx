@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Church, Heart, LogIn, Menu, User, LogOut, LayoutDashboard } from "lucide-react";
+import { Church, Heart, LogIn, Menu, User, LogOut } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -29,45 +29,34 @@ const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur-md shadow-sm">
       <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-20 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="relative">
-              <Church className="h-8 w-8 text-primary transition-transform group-hover:scale-110" />
-              <div className="absolute inset-0 bg-primary/20 blur-xl group-hover:bg-primary/30 transition-all" />
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-sky-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all">
+              <Church className="h-6 w-6 text-white" />
             </div>
-            <span className="font-playfair text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <span className="font-playfair text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-600 to-sky-600 bg-clip-text text-transparent">
               Doações Católicas
             </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden md:flex items-center gap-8">
             <Link
               to="/"
-              className="text-sm font-inter font-medium text-foreground/80 hover:text-foreground transition-colors"
+              className="text-base font-inter font-medium text-slate-700 hover:text-blue-600 transition-colors relative group"
             >
               Início
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300"></span>
             </Link>
             <Link
               to="/campanhas"
-              className="text-sm font-inter font-medium text-foreground/80 hover:text-foreground transition-colors"
+              className="text-base font-inter font-medium text-slate-700 hover:text-blue-600 transition-colors relative group"
             >
               Campanhas
-            </Link>
-            <Link
-              to="/como-funciona"
-              className="text-sm font-inter font-medium text-foreground/80 hover:text-foreground transition-colors"
-            >
-              Como Funciona
-            </Link>
-            <Link
-              to="/sobre"
-              className="text-sm font-inter font-medium text-foreground/80 hover:text-foreground transition-colors"
-            >
-              Sobre
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300"></span>
             </Link>
           </nav>
 
@@ -92,13 +81,6 @@ const Header = () => {
                     </div>
                   </div>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link to="/painel/paroquia" className="cursor-pointer">
-                      <LayoutDashboard className="mr-2 h-4 w-4" />
-                      Painel
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-red-600">
                     <LogOut className="mr-2 h-4 w-4" />
                     Sair
@@ -107,15 +89,15 @@ const Header = () => {
               </DropdownMenu>
             ) : (
               <>
-                <Button variant="ghost" size="sm" asChild>
+                <Button variant="ghost" size="default" className="text-slate-700" asChild>
                   <Link to="/login">
-                    <LogIn className="mr-2 h-4 w-4" />
+                    <LogIn className="mr-2 h-5 w-5" />
                     Entrar
                   </Link>
                 </Button>
-                <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sacred" asChild>
+                <Button size="default" className="bg-gradient-to-r from-blue-600 to-sky-600 hover:from-blue-700 hover:to-sky-700 text-white shadow-lg hover:shadow-xl transition-all" asChild>
                   <Link to="/paroquia/cadastro">
-                    <Heart className="mr-2 h-4 w-4" />
+                    <Heart className="mr-2 h-5 w-5" />
                     Sou Paróquia
                   </Link>
                 </Button>
@@ -171,12 +153,6 @@ const Header = () => {
                       <p className="font-medium">{profile?.full_name || 'Usuário'}</p>
                       <p className="text-xs text-muted-foreground">{user.email}</p>
                     </div>
-                    <Button variant="ghost" size="sm" asChild>
-                      <Link to="/painel/paroquia" onClick={() => setMobileMenuOpen(false)}>
-                        <LayoutDashboard className="mr-2 h-4 w-4" />
-                        Painel
-                      </Link>
-                    </Button>
                     <Button variant="ghost" size="sm" onClick={() => { handleSignOut(); setMobileMenuOpen(false); }} className="text-red-600">
                       <LogOut className="mr-2 h-4 w-4" />
                       Sair

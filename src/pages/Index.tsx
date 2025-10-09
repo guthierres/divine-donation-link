@@ -204,28 +204,28 @@ const Index = () => {
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid md:grid-cols-3 gap-12 text-center">
             <div className="space-y-4 group">
-              <div className="font-playfair text-6xl md:text-7xl font-bold bg-gradient-to-r from-blue-400 to-sky-400 bg-clip-text text-transparent group-hover:scale-110 transition-transform">
+              <div className="font-playfair text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-sky-400 bg-clip-text text-transparent group-hover:scale-110 transition-transform">
                 R$ 2,5M+
               </div>
-              <p className="text-xl text-slate-300">
+              <p className="text-lg md:text-xl text-slate-300">
                 Arrecadados para as paróquias
               </p>
               <div className="w-20 h-1 bg-gradient-to-r from-blue-500 to-sky-500 mx-auto rounded-full" />
             </div>
             <div className="space-y-4 group">
-              <div className="font-playfair text-6xl md:text-7xl font-bold bg-gradient-to-r from-sky-400 to-cyan-400 bg-clip-text text-transparent group-hover:scale-110 transition-transform">
+              <div className="font-playfair text-4xl md:text-5xl font-bold bg-gradient-to-r from-sky-400 to-cyan-400 bg-clip-text text-transparent group-hover:scale-110 transition-transform">
                 150+
               </div>
-              <p className="text-xl text-slate-300">
+              <p className="text-lg md:text-xl text-slate-300">
                 Paróquias cadastradas
               </p>
               <div className="w-20 h-1 bg-gradient-to-r from-sky-500 to-cyan-500 mx-auto rounded-full" />
             </div>
             <div className="space-y-4 group">
-              <div className="font-playfair text-6xl md:text-7xl font-bold bg-gradient-to-r from-cyan-400 to-teal-400 bg-clip-text text-transparent group-hover:scale-110 transition-transform">
+              <div className="font-playfair text-4xl md:text-5xl font-bold bg-gradient-to-r from-cyan-400 to-teal-400 bg-clip-text text-transparent group-hover:scale-110 transition-transform">
                 12.500+
               </div>
-              <p className="text-xl text-slate-300">
+              <p className="text-lg md:text-xl text-slate-300">
                 Doadores ativos
               </p>
               <div className="w-20 h-1 bg-gradient-to-r from-cyan-500 to-teal-500 mx-auto rounded-full" />

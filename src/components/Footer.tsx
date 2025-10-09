@@ -5,7 +5,7 @@ const Footer = () => {
   return (
     <footer className="bg-gradient-sacred border-t border-border/40">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Brand */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
@@ -54,24 +54,19 @@ const Footer = () => {
             </nav>
           </div>
 
-          {/* Contact */}
+          {/* Legal */}
           <div className="space-y-4">
-            <h3 className="font-playfair font-semibold text-foreground">Contato</h3>
-            <div className="flex flex-col gap-3 font-inter text-sm">
-              <a href="mailto:contato@doacoescatolicas.com.br" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-                <Mail className="h-4 w-4" />
-                contato@doacoescatolicas.com.br
-              </a>
-              <a href="tel:+5511999999999" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-                <Phone className="h-4 w-4" />
-                (11) 99999-9999
-              </a>
-              <div className="flex items-start gap-2 text-muted-foreground">
-                <MapPin className="h-4 w-4 mt-0.5" />
-                <span>São Paulo, SP<br />Brasil</span>
-              </div>
-            </div>
+            <h3 className="font-playfair font-semibold text-foreground">Legal</h3>
+            <nav className="flex flex-col gap-2 font-inter text-sm">
+              <Link to="/politica-privacidade" className="text-muted-foreground hover:text-foreground transition-colors">
+                Política de Privacidade
+              </Link>
+              <Link to="/termos-uso" className="text-muted-foreground hover:text-foreground transition-colors">
+                Termos de Uso
+              </Link>
+            </nav>
           </div>
+
         </div>
 
         {/* Bottom Bar */}
