@@ -61,27 +61,43 @@ export function NotificationBell() {
     }
   };
 
-  const subscribeToNotifications = () => {
-    const channel = supabase
-      .channel('notifications-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notifications'
-        },
-        (payload) => {
-          console.log('Nova notificação:', payload);
-          setNotifications(prev => [payload.new as Notification, ...prev]);
-          setUnreadCount(prev => prev + 1);
-        }
-      )
-      .subscribe();
+  const subscribeToNotifications = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+      const { data: parish } = await supabase
+        .from("parishes")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (!parish) return;
+
+      const channel = supabase
+        .channel('notifications-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'notifications',
+            filter: `parish_id=eq.${parish.id}`
+          },
+          (payload) => {
+            console.log('Nova notificação:', payload);
+            setNotifications(prev => [payload.new as Notification, ...prev.slice(0, 9)]);
+            setUnreadCount(prev => prev + 1);
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    } catch (error) {
+      console.error("Error subscribing to notifications:", error);
+    }
   };
 
   const markAsRead = async (notificationId: string) => {
