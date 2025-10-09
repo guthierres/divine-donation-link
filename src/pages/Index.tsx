@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CampaignCard from "@/components/CampaignCard";
@@ -5,44 +6,59 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Heart, Search, Shield, TrendingUp, ArrowRight } from "lucide-react";
 import heroImage from "@/assets/hero-church.jpg";
+import { supabase } from "@/integrations/supabase/client";
+
+interface Campaign {
+  id: string;
+  title: string;
+  slug: string;
+  current_amount: number;
+  goal_amount: number;
+  image_url: string | null;
+  parishes: {
+    name: string;
+    city: string;
+    state: string;
+  };
+}
 
 const Index = () => {
-  // Sample campaigns data - will be replaced with real data later
-  const featuredCampaigns = [
-    {
-      id: "1",
-      title: "Reforma do Telhado da Igreja Matriz",
-      parish: "Paróquia Sagrada Família",
-      location: "São Paulo, SP",
-      image: "https://images.unsplash.com/photo-1464207687429-7505649dae38?w=800&q=80",
-      currentAmount: 45000,
-      goalAmount: 100000,
-      donorsCount: 234,
-      slug: "reforma-telhado-sagrada-familia",
-    },
-    {
-      id: "2",
-      title: "Cestas Básicas para Famílias Carentes",
-      parish: "Paróquia São José Operário",
-      location: "Rio de Janeiro, RJ",
-      image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&q=80",
-      currentAmount: 12500,
-      goalAmount: 20000,
-      donorsCount: 156,
-      slug: "cestas-basicas-sao-jose",
-    },
-    {
-      id: "3",
-      title: "Construção da Nova Capela",
-      parish: "Paróquia Nossa Senhora Aparecida",
-      location: "Belo Horizonte, MG",
-      image: "https://images.unsplash.com/photo-1478476868527-002ae3f3e159?w=800&q=80",
-      currentAmount: 78000,
-      goalAmount: 150000,
-      donorsCount: 412,
-      slug: "construcao-capela-aparecida",
-    },
-  ];
+  const [featuredCampaigns, setFeaturedCampaigns] = useState<Campaign[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadActiveCampaigns();
+  }, []);
+
+  const loadActiveCampaigns = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("campaigns")
+        .select(`
+          id,
+          title,
+          slug,
+          current_amount,
+          goal_amount,
+          image_url,
+          parishes (
+            name,
+            city,
+            state
+          )
+        `)
+        .eq("status", "active")
+        .order("created_at", { ascending: false })
+        .limit(3);
+
+      if (error) throw error;
+      setFeaturedCampaigns(data || []);
+    } catch (error) {
+      console.error("Error loading campaigns:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col font-inter">
@@ -181,20 +197,57 @@ const Index = () => {
             </Button>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredCampaigns.map((campaign) => (
-              <CampaignCard key={campaign.id} {...campaign} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="text-center py-12">
+              <p className="text-lg text-slate-600">Carregando campanhas...</p>
+            </div>
+          ) : featuredCampaigns.length > 0 ? (
+            <>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {featuredCampaigns.map((campaign) => (
+                  <CampaignCard
+                    key={campaign.id}
+                    id={campaign.id}
+                    title={campaign.title}
+                    parish={campaign.parishes.name}
+                    location={`${campaign.parishes.city}, ${campaign.parishes.state}`}
+                    image={campaign.image_url || "https://images.unsplash.com/photo-1464207687429-7505649dae38?w=800&q=80"}
+                    currentAmount={Number(campaign.current_amount)}
+                    goalAmount={Number(campaign.goal_amount)}
+                    donorsCount={0}
+                    slug={campaign.slug}
+                  />
+                ))}
+              </div>
 
-          <div className="mt-8 text-center md:hidden">
-            <Button variant="outline" asChild className="w-full">
-              <Link to="/campanhas">
-                Ver Todas as Campanhas
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
+              <div className="mt-8 text-center md:hidden">
+                <Button variant="outline" asChild className="w-full">
+                  <Link to="/campanhas">
+                    Ver Todas as Campanhas
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-16">
+              <div className="inline-block mb-4 p-6 bg-slate-100 rounded-full">
+                <Heart className="h-12 w-12 text-slate-400" />
+              </div>
+              <h3 className="text-2xl font-playfair font-bold text-slate-900 mb-2">
+                Nenhuma campanha ativa no momento
+              </h3>
+              <p className="text-lg text-slate-600 mb-6">
+                Novas campanhas serão adicionadas em breve
+              </p>
+              <Button asChild className="bg-gradient-to-r from-blue-600 to-sky-600 hover:from-blue-700 hover:to-sky-700">
+                <Link to="/paroquia/cadastro">
+                  <TrendingUp className="mr-2 h-5 w-5" />
+                  Cadastrar Paróquia
+                </Link>
+              </Button>
+            </div>
+          )}
         </div>
       </section>
 
