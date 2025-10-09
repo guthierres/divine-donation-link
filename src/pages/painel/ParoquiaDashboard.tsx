@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Church, TrendingUp, Heart, Plus, ExternalLink, Settings, LogOut } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { NotificationBell } from "@/components/NotificationBell";
 
 interface Parish {
   id: string;
@@ -150,6 +151,7 @@ const ParoquiaDashboard = () => {
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <NotificationBell />
               <Button variant="outline" asChild>
                 <Link to={`/paroquia/${parish.slug}`} target="_blank">
                   <ExternalLink className="mr-2 h-4 w-4" />
