@@ -19,6 +19,16 @@ import NotFound from "./pages/NotFound";
 import PoliticaPrivacidade from "./pages/PoliticaPrivacidade";
 import TermosUso from "./pages/TermosUso";
 
+// Painel Admin
+import AdminDashboard from "./pages/painel/AdminDashboard";
+
+// Painel Paróquia
+import ParoquiaDashboard from "./pages/painel/ParoquiaDashboard";
+import ParoquiaCampanhas from "./pages/painel/ParoquiaCampanhas";
+import ParoquiaCampanhaForm from "./pages/painel/ParoquiaCampanhaForm";
+import ParoquiaConfiguracoes from "./pages/painel/ParoquiaConfiguracoes";
+import ParoquiaDoacoes from "./pages/painel/ParoquiaDoacoes";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -40,6 +50,18 @@ const App = () => (
             <Route path="/doacao/erro" element={<DonationError />} />
             <Route path="/politica-privacidade" element={<PoliticaPrivacidade />} />
             <Route path="/termos-uso" element={<TermosUso />} />
+            
+            {/* Painel Admin */}
+            <Route path="/painel/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
+            
+            {/* Painel Paróquia */}
+            <Route path="/painel/paroquia" element={<ProtectedRoute><ParoquiaDashboard /></ProtectedRoute>} />
+            <Route path="/painel/paroquia/campanhas" element={<ProtectedRoute><ParoquiaCampanhas /></ProtectedRoute>} />
+            <Route path="/painel/paroquia/campanhas/nova" element={<ProtectedRoute><ParoquiaCampanhaForm /></ProtectedRoute>} />
+            <Route path="/painel/paroquia/campanhas/:id/editar" element={<ProtectedRoute><ParoquiaCampanhaForm /></ProtectedRoute>} />
+            <Route path="/painel/paroquia/configuracoes" element={<ProtectedRoute><ParoquiaConfiguracoes /></ProtectedRoute>} />
+            <Route path="/painel/paroquia/doacoes" element={<ProtectedRoute><ParoquiaDoacoes /></ProtectedRoute>} />
+            
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
