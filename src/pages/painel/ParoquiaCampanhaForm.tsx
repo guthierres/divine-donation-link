@@ -132,17 +132,20 @@ const ParoquiaCampanhaForm = () => {
     setLoading(true);
 
     try {
+      type CampaignCategory = "caridade" | "construcao" | "eventos" | "missas" | "outros" | "reforma";
+      type CampaignStatus = "draft" | "active" | "paused" | "completed" | "cancelled";
+
       const campaignData = {
         parish_id: parish.id,
         title: formData.title,
         slug: formData.slug,
         description: formData.description,
-        category: formData.category,
+        category: formData.category as CampaignCategory,
         goal_amount: parseFloat(formData.goal_amount),
         image_url: formData.image_url || null,
         video_url: formData.video_url || null,
         end_date: formData.end_date ? new Date(formData.end_date).toISOString() : null,
-        status: formData.status,
+        status: formData.status as CampaignStatus,
       };
 
       if (id) {

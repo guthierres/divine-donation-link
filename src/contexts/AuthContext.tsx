@@ -7,7 +7,6 @@ interface UserProfile {
   id: string;
   email: string;
   full_name: string;
-  role: "super_admin" | "parish_admin";
   avatar_url?: string;
 }
 
@@ -86,13 +85,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (error) throw error;
 
     if (data.user) {
-      const { data: userProfile } = await supabase
-        .from("users")
+      const { data: userRoles } = await supabase
+        .from("user_roles")
         .select("role")
-        .eq("id", data.user.id)
+        .eq("user_id", data.user.id)
         .maybeSingle();
 
-      if (userProfile?.role === 'super_admin') {
+      if (userRoles?.role === 'super_admin') {
         navigate('/painel/admin');
       } else {
         navigate('/painel/paroquia');
@@ -121,8 +120,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     navigate("/");
   };
 
-  const isAdmin = profile?.role === "super_admin";
-  const isParishAdmin = profile?.role === "parish_admin";
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isParishAdmin, setIsParishAdmin] = useState(false);
+
+  useEffect(() => {
+    const checkRoles = async () => {
+      if (!user) {
+        setIsAdmin(false);
+        setIsParishAdmin(false);
+        return;
+      }
+
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id);
+
+      if (roles) {
+        setIsAdmin(roles.some(r => r.role === 'super_admin'));
+        setIsParishAdmin(roles.some(r => r.role === 'parish_admin'));
+      }
+    };
+
+    checkRoles();
+  }, [user]);
 
   return (
     <AuthContext.Provider

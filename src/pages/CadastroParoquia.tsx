@@ -60,11 +60,20 @@ const CadastroParoquia = () => {
     }
 
     try {
-      const { error: insertError } = await supabase.from("parishes").insert({
-        ...formData,
+      const { error: insertError } = await supabase.from("parishes").insert([{
+        name: formData.name,
+        slug: formData.slug,
+        cnpj: formData.cnpj,
+        email: formData.email,
+        phone: formData.phone,
+        address: formData.address,
+        city: formData.city,
+        state: formData.state,
+        description: formData.description,
+        responsible_name: formData.name,
         user_id: user.id,
-        status: "pending",
-      });
+        status: "pending" as const,
+      }]);
 
       if (insertError) throw insertError;
 

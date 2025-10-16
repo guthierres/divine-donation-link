@@ -20,13 +20,15 @@ interface Parish {
   icon_url: string | null;
   pagarme_secret_key: string | null;
   pagarme_configured: boolean;
+  infinitepay_configured?: boolean;
+  infinitepay_api_key?: string | null;
 }
 
 const ParoquiaConfiguracoes = () => {
   const { profile } = useAuth();
   const [parish, setParish] = useState<Parish | null>(null);
-  const [publicKey, setPublicKey] = useState("");
   const [secretKey, setSecretKey] = useState("");
+  const [infinitepayApiKey, setInfinitepayApiKey] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
@@ -42,7 +44,7 @@ const ParoquiaConfiguracoes = () => {
     try {
       const { data, error } = await supabase
         .from("parishes")
-        .select("id, name, pagarme_public_key, pagarme_secret_key, pagarme_configured")
+        .select("id, name, pagarme_secret_key, pagarme_configured, infinitepay_api_key, infinitepay_configured")
         .eq("user_id", profile.id)
         .maybeSingle();
 
@@ -50,8 +52,8 @@ const ParoquiaConfiguracoes = () => {
 
       if (data) {
         setParish(data);
-        setPublicKey(data.pagarme_public_key || "");
         setSecretKey(data.pagarme_secret_key ? "••••••••••••••••" : "");
+        setInfinitepayApiKey(data.infinitepay_api_key ? "••••••••••••••••" : "");
       }
     } catch (error) {
       console.error("Error loading parish:", error);
@@ -68,11 +70,14 @@ const ParoquiaConfiguracoes = () => {
   const handleSave = async () => {
     if (!parish) return;
 
-    if (!publicKey || !secretKey || secretKey === "••••••••••••••••") {
+    const hasNewSecretKey = secretKey && secretKey !== "••••••••••••••••";
+    const hasNewInfinitepayKey = infinitepayApiKey && infinitepayApiKey !== "••••••••••••••••";
+
+    if (!hasNewSecretKey && !hasNewInfinitepayKey && !parish.pagarme_configured && !parish.infinitepay_configured) {
       toast({
         variant: "destructive",
         title: "Campos obrigatórios",
-        description: "Preencha a chave pública e secreta do Pagar.me.",
+        description: "Configure pelo menos um método de pagamento.",
       });
       return;
     }
@@ -80,13 +85,21 @@ const ParoquiaConfiguracoes = () => {
     setSaving(true);
 
     try {
+      const updateData: any = {};
+      
+      if (hasNewSecretKey) {
+        updateData.pagarme_secret_key = secretKey;
+        updateData.pagarme_configured = true;
+      }
+      
+      if (hasNewInfinitepayKey) {
+        updateData.infinitepay_api_key = infinitepayApiKey;
+        updateData.infinitepay_configured = true;
+      }
+
       const { error } = await supabase
         .from("parishes")
-        .update({
-          pagarme_public_key: publicKey,
-          pagarme_secret_key: secretKey,
-          pagarme_configured: true,
-        })
+        .update(updateData)
         .eq("id", parish.id);
 
       if (error) throw error;
@@ -177,30 +190,18 @@ const ParoquiaConfiguracoes = () => {
               )}
             </div>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <Alert>
-              <Key className="h-4 w-4" />
-              <AlertDescription>
-                Suas chaves do Pagar.me são únicas para sua paróquia e devem ser mantidas em sigilo.
-                Você pode encontrá-las no <a href="https://dashboard.pagar.me" target="_blank" rel="noopener noreferrer" className="underline font-semibold">painel do Pagar.me</a>.
-              </AlertDescription>
-            </Alert>
-
+          <CardContent className="space-y-8">
+            {/* Pagar.me Section */}
             <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="publicKey">Chave Pública (Public Key)</Label>
-                <Input
-                  id="publicKey"
-                  type="text"
-                  placeholder="pk_live_..."
-                  value={publicKey}
-                  onChange={(e) => setPublicKey(e.target.value)}
-                  disabled={saving}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Começa com pk_live_ ou pk_test_
-                </p>
-              </div>
+              <h3 className="font-semibold text-lg flex items-center gap-2">
+                <Key className="h-5 w-5" />
+                Pagar.me
+              </h3>
+              <Alert>
+                <AlertDescription>
+                  Configure o Pagar.me para aceitar cartões de crédito, PIX e boleto.
+                </AlertDescription>
+              </Alert>
 
               <div className="space-y-2">
                 <Label htmlFor="secretKey">Chave Secreta (Secret Key)</Label>
@@ -213,7 +214,37 @@ const ParoquiaConfiguracoes = () => {
                   disabled={saving}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Começa com sk_live_ ou sk_test_
+                  Encontre em <a href="https://dashboard.pagar.me" target="_blank" rel="noopener noreferrer" className="underline">dashboard.pagar.me</a> → Configurações → Chaves de API
+                </p>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* InfinitePay Section */}
+            <div className="space-y-4">
+              <h3 className="font-semibold text-lg flex items-center gap-2">
+                <Key className="h-5 w-5" />
+                InfinitePay
+              </h3>
+              <Alert>
+                <AlertDescription>
+                  Configure o InfinitePay para aceitar pagamentos via link de checkout.
+                </AlertDescription>
+              </Alert>
+
+              <div className="space-y-2">
+                <Label htmlFor="infinitepayApiKey">Chave de API (API Key)</Label>
+                <Input
+                  id="infinitepayApiKey"
+                  type="password"
+                  placeholder="infinitepay_..."
+                  value={infinitepayApiKey}
+                  onChange={(e) => setInfinitepayApiKey(e.target.value)}
+                  disabled={saving}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Encontre em <a href="https://www.infinitepay.io/desenvolvedores" target="_blank" rel="noopener noreferrer" className="underline">infinitepay.io/desenvolvedores</a>
                 </p>
               </div>
             </div>
