@@ -44,7 +44,7 @@ const ParoquiaConfiguracoes = () => {
     try {
       const { data, error } = await supabase
         .from("parishes")
-        .select("id, name, pagarme_secret_key, pagarme_configured, infinitepay_api_key, infinitepay_configured")
+        .select("id, name, logo_url, cover_url, icon_url, pagarme_secret_key, pagarme_configured, infinitepay_api_key, infinitepay_configured")
         .eq("user_id", profile.id)
         .maybeSingle();
 

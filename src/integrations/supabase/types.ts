@@ -201,6 +201,8 @@ export type Database = {
           email: string
           icon_url: string | null
           id: string
+          infinitepay_api_key: string | null
+          infinitepay_configured: boolean
           logo_url: string | null
           name: string
           pagarme_configured: boolean
@@ -223,6 +225,8 @@ export type Database = {
           email: string
           icon_url?: string | null
           id?: string
+          infinitepay_api_key?: string | null
+          infinitepay_configured?: boolean
           logo_url?: string | null
           name: string
           pagarme_configured?: boolean
@@ -245,6 +249,8 @@ export type Database = {
           email?: string
           icon_url?: string | null
           id?: string
+          infinitepay_api_key?: string | null
+          infinitepay_configured?: boolean
           logo_url?: string | null
           name?: string
           pagarme_configured?: boolean

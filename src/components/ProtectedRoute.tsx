@@ -8,18 +8,18 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps) => {
-  const { user, profile, loading } = useAuth();
+  const { user, loading, isAdmin } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!loading) {
       if (!user) {
         navigate("/login");
-      } else if (requireAdmin && profile?.role !== "super_admin") {
+      } else if (requireAdmin && !isAdmin) {
         navigate("/painel/paroquia");
       }
     }
-  }, [user, profile, loading, requireAdmin, navigate]);
+  }, [user, loading, requireAdmin, navigate, isAdmin]);
 
   if (loading) {
     return (
@@ -33,7 +33,7 @@ const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps)
     return null;
   }
 
-  if (requireAdmin && profile?.role !== "super_admin") {
+  if (requireAdmin && !isAdmin) {
     return null;
   }
 

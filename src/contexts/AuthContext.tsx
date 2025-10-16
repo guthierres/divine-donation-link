@@ -91,7 +91,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .eq("user_id", data.user.id)
         .maybeSingle();
 
-      if (userRoles?.role === 'super_admin') {
+      if (userRoles?.role === 'admin') {
         navigate('/painel/admin');
       } else {
         navigate('/painel/paroquia');
@@ -136,9 +136,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .select("role")
         .eq("user_id", user.id);
 
-      if (roles) {
-        setIsAdmin(roles.some(r => r.role === 'super_admin'));
-        setIsParishAdmin(roles.some(r => r.role === 'parish_admin'));
+      if (roles && roles.length > 0) {
+        setIsAdmin(roles.some(r => r.role === 'admin'));
+        setIsParishAdmin(roles.some(r => r.role === 'parish'));
       }
     };
 
